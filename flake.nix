@@ -4,26 +4,38 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
-    # home-manager = {
-    #   url = "github:nix-community/home-manager";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, ... }@inputs: {
-    nixosConfigurations.default = nixpkgs.lib.nixosSystem {
-      specialArgs = {inherit inputs;};
-      modules = [
-        ./configuration.nix
-        # inputs.home-manager.nixosModules.default
-      ];
+  outputs = { self, nixpkgs, home-manager, ... }:
+    let
+      lib = nixpkgs.lib;
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
+      nixosConfigurations = {
+        default = lib.nixosSystem {
+          inherit system;
+          modules = [
+            ./configuration.nix
+          ];
+        };
+        rogvm = lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            ./configuration.nix
+          ];
+        };
+      };
+
+      homeConfigurations = {
+        dabrown = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          modules = [ ./home.nix ];
+        };
+      };
     };
-    nixosConfigurations.rogvm = nixpkgs.lib.nixosSystem {
-      specialArgs = {inherit inputs;};
-      modules = [
-        ./configuration.nix
-        # inputs.home-manager.nixosModules.default
-      ];
-    };
-  };
 }
