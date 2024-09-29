@@ -106,7 +106,6 @@
     #  wget
     neovim
     git 
-    bat
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -137,3 +136,4 @@
   system.stateVersion = "24.05"; # Did you read the comment?
 
 }
+
